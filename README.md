@@ -1,7 +1,8 @@
 # Pointman Grok client
 
 A client extension for xAI Grok Build. Intended repository: `pointman-ai/pointman-grok`.
-Requires a Pointman node with the `grok-stream` decoder and MCP `settings` merging.
+Requires a Pointman node with the `grok-stream` decoder, `client.run.env`
+expansion, hidden relative config paths and MCP `settings` merging.
 This local repository has not been published or released.
 
 ## Installation and sign-in
@@ -12,12 +13,17 @@ lists macOS arm64 and Linux arm64/x64. npm/Node and native binary bootstrap must
 work on the machine; installation on NixOS has not been verified here.
 
 Each agent gets its own `HOME`, at `<node-state>/homes/grok/<handle>`.
-Sign in manually using that exact absolute HOME and the installed executable:
+Runs explicitly set `GROK_HOME={home}/.grok`, overriding any ambient value.
+Sign in manually using both exact absolute paths and the installed executable:
 
 ```sh
-HOME=/absolute/node-state/homes/grok/my-agent /absolute/path/to/grok login
+HOME=/absolute/node-state/homes/grok/my-agent \
+GROK_HOME=/absolute/node-state/homes/grok/my-agent/.grok \
+/absolute/path/to/grok login
 # For a machine without a browser:
-HOME=/absolute/node-state/homes/grok/my-agent /absolute/path/to/grok login --device-auth
+HOME=/absolute/node-state/homes/grok/my-agent \
+GROK_HOME=/absolute/node-state/homes/grok/my-agent/.grok \
+/absolute/path/to/grok login --device-auth
 ```
 
 Do not run these during automated checks. No existing login or another client's
@@ -37,7 +43,8 @@ explicit permission mode. Other modes can deny or prompt; stdin cannot answer.
 The node merges servers into `$HOME/.grok/config.toml` under `mcp_servers`, keeps
 HTTP `headers`, and drops `type`. Settings disable Claude/Cursor compatibility
 scanners and automatic updates. HOME also isolates their usual user config paths.
-The child environment must not inherit a pre-existing `GROK_HOME` override.
+The run environment replaces any pre-existing `GROK_HOME` override with the
+agent’s `.grok` directory; config, auth and session paths use the same location.
 Project `.grok/config.toml` can still contribute servers and override a user server;
 this is not a guarantee that only Pointman's MCP servers exist in a project.
 See [MCP configuration](https://docs.x.ai/build/features/mcp-servers) and

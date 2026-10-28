@@ -30,6 +30,7 @@ class ManifestContract(unittest.TestCase):
 
     def test_home_and_compatibility_isolation(self):
         self.assertEqual(self.client["home_env"], "HOME")
+        self.assertEqual(self.client["run"]["env"], {"GROK_HOME": "{home}/.grok"})
         self.assertEqual(self.client["api_keys"], ["XAI_API_KEY"])
         mcp = self.client["mcp"]
         self.assertEqual((mcp["via"], mcp["file"], mcp["key"]), ("config-file", ".grok/config.toml", "mcp_servers"))

@@ -18,10 +18,12 @@ from = "npm"
 package = "@xai-official/grok"
 
 [client.sign_in]
-how = "HOME=<agent-home> grok login (headless: grok login --device-auth)"
+how = "HOME=<agent-home> GROK_HOME=<agent-home>/.grok grok login"
 # No documented offline login-status command. Do not probe by making a model call.
 
 [client.run]
+# Override an ambient GROK_HOME so config, auth and sessions remain inside HOME.
+env = { GROK_HOME = "{home}/.grok" }
 prompt = "arg"
 args = ["--no-auto-update", "-p", "{prompt}", "--output-format", "streaming-json", "{session}", "{model}", "{permissions}", "{instructions}"]
 new_session = ["--session-id", "{value}"]
