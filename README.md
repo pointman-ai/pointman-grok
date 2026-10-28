@@ -1,7 +1,7 @@
 # Pointman Grok client
 
 A client extension for xAI Grok Build. Intended repository: `pointman-ai/pointman-grok`.
-Requires a Pointman node with the `grok-stream` decoder, `client.run.env`
+Requires Pointman node 0.4.2 or newer with the `grok-stream` decoder, `client.run.env`
 expansion, hidden relative config paths and MCP `settings` merging.
 This local repository has not been published or released.
 

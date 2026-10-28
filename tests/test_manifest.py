@@ -15,6 +15,7 @@ class ManifestContract(unittest.TestCase):
 
     def test_install_and_protocol(self):
         self.assertEqual(self.manifest["extension"]["id"], "grok")
+        self.assertEqual(self.manifest["extension"]["node"], ">=0.4.2")
         self.assertEqual(self.client["protocol"], "grok-stream")
         self.assertEqual(self.client["install"], {"from": "npm", "package": "@xai-official/grok"})
         self.assertEqual(self.client["binaries"], ["grok"])

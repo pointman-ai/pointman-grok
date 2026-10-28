@@ -2,6 +2,7 @@
 id = "grok"
 name = "Grok Build"
 version = "0.1.0"
+node = ">=0.4.2"
 publisher = "pointman-ai"
 summary = "xAI's coding agent, with explicit sessions and an isolated home."
 
