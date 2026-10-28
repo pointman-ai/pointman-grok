@@ -1,11 +1,14 @@
 # Pointman Grok client
 
-A client extension for xAI Grok Build. Intended repository: `pointman-ai/pointman-grok`.
+A client extension for xAI Grok Build. Repository: `pointman-ai/pointman-grok`.
 Requires Pointman node 0.4.2 or newer with the `grok-stream` decoder, `client.run.env`
 expansion, hidden relative config paths and MCP `settings` merging.
-This local repository has not been published or released.
 
-## Installation and sign-in
+## Connect once
+
+Run `/grok add` in Pointman and paste the xAI API key into the private form. The key is sealed as `grok.key` in the vault. The node opens its current machine seal for every run; agents receive it only in the process environment, never in command arguments or saved launch metadata.
+
+## Installation and optional isolated login
 
 Pointman installs `@xai-official/grok` through its npm installer when needed.
 The [official npm wrapper](https://github.com/xai-org/grok-build/blob/main/crates/codegen/xai-grok-pager/npm/grok/README.md)
@@ -28,7 +31,7 @@ GROK_HOME=/absolute/node-state/homes/grok/my-agent/.grok \
 
 Do not run these during automated checks. No existing login or another client's
 credentials are copied. Ordinary `grok login` with your usual HOME does not sign
-this isolated agent in. The node strips `XAI_API_KEY`; this extension uses login.
+this isolated agent in. The node strips an inherited `XAI_API_KEY`, then injects the current vault key only for the run.
 There is no documented offline sign-in status check, so the manifest supplies none.
 Grok's wrapper may bootstrap a binary under the isolated home on first use.
 

@@ -46,6 +46,12 @@ class ManifestContract(unittest.TestCase):
         self.assertEqual(self.client["run"]["permissions"]["default"], ["--permission-mode", "dontAsk", "--allow", "MCPTool"])
         self.assertNotIn("check", self.client["sign_in"])
 
+    def test_one_vault_form_supplies_every_agents_run(self):
+        self.assertEqual(self.manifest["client"]["key"], {"secret": "grok.key", "env": "XAI_API_KEY"})
+        self.assertEqual(self.manifest["permissions"]["secrets"], ["grok.key"])
+        self.assertEqual(self.manifest["credentials"][0]["item"], "grok.key")
+        self.assertEqual((self.manifest["commands"][0]["slash"], self.manifest["commands"][0]["form"]), ("add", "key"))
+
     def test_native_fixture_is_chunked_and_not_messages_format(self):
         stream = [json.loads(line) for line in (ROOT / "tests/fixtures/native.jsonl").read_text().splitlines()]
         self.assertEqual("".join(e["data"] for e in stream if e["type"] == "text"), "Hello world.\n")
