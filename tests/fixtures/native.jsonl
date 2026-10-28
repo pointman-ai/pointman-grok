@@ -1,0 +1,8 @@
+{"type":"available_commands","tools":["read_file"],"commands":[]}
+{"type":"thought","data":"Private reasoning is not a reply."}
+{"type":"tool_call","toolCallId":"call_1","title":"Read source","kind":"read","status":"in_progress","toolName":"read_file","rawInput":{"path":"src/main.rs"},"content":[],"locations":[]}
+{"type":"tool_call_update","toolCallId":"call_1","status":"completed","rawOutput":{"lines":42},"content":[],"locations":[]}
+{"type":"text","data":"Hello"}
+{"type":"text","data":" world.\n"}
+{"type":"usage","messageId":"response_1","stopReason":"end_turn","usage":{"input_tokens":812,"output_tokens":45}}
+{"type":"end","stopReason":"end_turn","sessionId":"11111111-2222-4333-8444-555555555555","requestId":"request_1","total_cost_usd":0.0123}

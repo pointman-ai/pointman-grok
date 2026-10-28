@@ -1,0 +1,51 @@
+[extension]
+id = "grok"
+name = "Grok Build"
+version = "0.1.0"
+publisher = "pointman-ai"
+summary = "xAI's coding agent, with explicit sessions and an isolated home."
+
+[client]
+npm = "@xai-official/grok"
+binaries = ["grok"]
+protocol = "grok-stream"
+# HOME isolates Grok plus ~/.claude.json, ~/.cursor, ~/.agents and credential discovery.
+home_env = "HOME"
+api_keys = ["XAI_API_KEY"]
+
+[client.install]
+from = "npm"
+package = "@xai-official/grok"
+
+[client.sign_in]
+how = "HOME=<agent-home> grok login (headless: grok login --device-auth)"
+# No documented offline login-status command. Do not probe by making a model call.
+
+[client.run]
+prompt = "arg"
+args = ["--no-auto-update", "-p", "{prompt}", "--output-format", "streaming-json", "{session}", "{model}", "{permissions}", "{instructions}"]
+new_session = ["--session-id", "{value}"]
+resume = ["--resume", "{value}"]
+model = ["--model", "{value}"]
+
+[client.run.permissions]
+default = ["--permission-mode", "dontAsk", "--allow", "MCPTool"]
+auto = ["--permission-mode", "auto"]
+acceptEdits = ["--permission-mode", "acceptEdits"]
+plan = ["--permission-mode", "plan"]
+
+[client.instructions]
+via = "flag"
+args = ["--rules", "{value}"]
+
+[client.mcp]
+via = "config-file"
+file = ".grok/config.toml"
+key = "mcp_servers"
+drop = ["type"]
+# Parent merges these settings into the config alongside mcp_servers.
+settings = { compat = { claude = { mcps = false, hooks = false, skills = false, rules = false, agents = false }, cursor = { mcps = false, hooks = false, skills = false, rules = false, agents = false } }, cli = { auto_update = false } }
+
+[client.limits]
+# Native output has no typed account-limit event. Error text is the only signal available.
+words = ["rate limit", "rate_limit", "too many requests", "quota exceeded", "usage limit"]
