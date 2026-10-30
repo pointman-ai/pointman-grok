@@ -1,10 +1,14 @@
 # Pointman Grok client
 
-A client extension for xAI Grok Build. Intended repository: `pointman-ai/pointman-grok`.
-Requires a Pointman node with the `grok-stream` decoder and MCP `settings` merging.
-This local repository has not been published or released.
+A client extension for xAI Grok Build. Repository: `pointman-ai/pointman-grok`.
+Requires Pointman node 0.4.2 or newer with the `grok-stream` decoder, `client.run.env`
+expansion, hidden relative config paths and MCP `settings` merging.
 
-## Installation and sign-in
+## Connect once
+
+Run `/grok add` in Pointman and paste the xAI API key into the private form. The key is sealed as `grok.key` in the vault. The node opens its current machine seal for every run; agents receive it only in the process environment, never in command arguments or saved launch metadata.
+
+## Installation and optional isolated login
 
 Pointman installs `@xai-official/grok` through its npm installer when needed.
 The [official npm wrapper](https://github.com/xai-org/grok-build/blob/main/crates/codegen/xai-grok-pager/npm/grok/README.md)
@@ -12,17 +16,22 @@ lists macOS arm64 and Linux arm64/x64. npm/Node and native binary bootstrap must
 work on the machine; installation on NixOS has not been verified here.
 
 Each agent gets its own `HOME`, at `<node-state>/homes/grok/<handle>`.
-Sign in manually using that exact absolute HOME and the installed executable:
+Runs explicitly set `GROK_HOME={home}/.grok`, overriding any ambient value.
+Sign in manually using both exact absolute paths and the installed executable:
 
 ```sh
-HOME=/absolute/node-state/homes/grok/my-agent /absolute/path/to/grok login
+HOME=/absolute/node-state/homes/grok/my-agent \
+GROK_HOME=/absolute/node-state/homes/grok/my-agent/.grok \
+/absolute/path/to/grok login
 # For a machine without a browser:
-HOME=/absolute/node-state/homes/grok/my-agent /absolute/path/to/grok login --device-auth
+HOME=/absolute/node-state/homes/grok/my-agent \
+GROK_HOME=/absolute/node-state/homes/grok/my-agent/.grok \
+/absolute/path/to/grok login --device-auth
 ```
 
 Do not run these during automated checks. No existing login or another client's
 credentials are copied. Ordinary `grok login` with your usual HOME does not sign
-this isolated agent in. The node strips `XAI_API_KEY`; this extension uses login.
+this isolated agent in. The node strips an inherited `XAI_API_KEY`, then injects the current vault key only for the run.
 There is no documented offline sign-in status check, so the manifest supplies none.
 Grok's wrapper may bootstrap a binary under the isolated home on first use.
 
@@ -37,7 +46,8 @@ explicit permission mode. Other modes can deny or prompt; stdin cannot answer.
 The node merges servers into `$HOME/.grok/config.toml` under `mcp_servers`, keeps
 HTTP `headers`, and drops `type`. Settings disable Claude/Cursor compatibility
 scanners and automatic updates. HOME also isolates their usual user config paths.
-The child environment must not inherit a pre-existing `GROK_HOME` override.
+The run environment replaces any pre-existing `GROK_HOME` override with the
+agent’s `.grok` directory; config, auth and session paths use the same location.
 Project `.grok/config.toml` can still contribute servers and override a user server;
 this is not a guarantee that only Pointman's MCP servers exist in a project.
 See [MCP configuration](https://docs.x.ai/build/features/mcp-servers) and

@@ -15,6 +15,7 @@ class ManifestContract(unittest.TestCase):
 
     def test_install_and_protocol(self):
         self.assertEqual(self.manifest["extension"]["id"], "grok")
+        self.assertEqual(self.manifest["extension"]["node"], ">=0.4.2")
         self.assertEqual(self.client["protocol"], "grok-stream")
         self.assertEqual(self.client["install"], {"from": "npm", "package": "@xai-official/grok"})
         self.assertEqual(self.client["binaries"], ["grok"])
@@ -30,6 +31,7 @@ class ManifestContract(unittest.TestCase):
 
     def test_home_and_compatibility_isolation(self):
         self.assertEqual(self.client["home_env"], "HOME")
+        self.assertEqual(self.client["run"]["env"], {"GROK_HOME": "{home}/.grok"})
         self.assertEqual(self.client["api_keys"], ["XAI_API_KEY"])
         mcp = self.client["mcp"]
         self.assertEqual((mcp["via"], mcp["file"], mcp["key"]), ("config-file", ".grok/config.toml", "mcp_servers"))
@@ -43,6 +45,12 @@ class ManifestContract(unittest.TestCase):
         self.assertEqual(set(self.client["run"]["permissions"]), {"default", "auto", "acceptEdits", "plan"})
         self.assertEqual(self.client["run"]["permissions"]["default"], ["--permission-mode", "dontAsk", "--allow", "MCPTool"])
         self.assertNotIn("check", self.client["sign_in"])
+
+    def test_one_vault_form_supplies_every_agents_run(self):
+        self.assertEqual(self.manifest["client"]["key"], {"secret": "grok.key", "env": "XAI_API_KEY"})
+        self.assertEqual(self.manifest["permissions"]["secrets"], ["grok.key"])
+        self.assertEqual(self.manifest["credentials"][0]["item"], "grok.key")
+        self.assertEqual((self.manifest["commands"][0]["slash"], self.manifest["commands"][0]["form"]), ("add", "key"))
 
     def test_native_fixture_is_chunked_and_not_messages_format(self):
         stream = [json.loads(line) for line in (ROOT / "tests/fixtures/native.jsonl").read_text().splitlines()]
