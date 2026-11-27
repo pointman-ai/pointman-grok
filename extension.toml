@@ -1,12 +1,12 @@
 [extension]
 id = "grok"
 name = "Grok Build"
-version = "0.1.0"
-node = ">=0.4.2"
+version = "0.2.0"
+node = ">=0.6,<1"
 publisher = "aurelio"
 summary = "xAI's coding agent, with explicit sessions and an isolated home."
 
-[client]
+[harness]
 npm = "@xai-official/grok"
 binaries = ["grok"]
 protocol = "grok-stream"
@@ -14,15 +14,15 @@ protocol = "grok-stream"
 home_env = "HOME"
 api_keys = ["XAI_API_KEY"]
 
-[client.install]
+[harness.install]
 from = "npm"
 package = "@xai-official/grok"
 
-[client.sign_in]
+[harness.sign_in]
 how = "HOME=<agent-home> GROK_HOME=<agent-home>/.grok grok login"
 # No documented offline login-status command. Do not probe by making a model call.
 
-[client.run]
+[harness.run]
 # Override an ambient GROK_HOME so config, auth and sessions remain inside HOME.
 env = { GROK_HOME = "{home}/.grok" }
 prompt = "arg"
@@ -31,17 +31,17 @@ new_session = ["--session-id", "{value}"]
 resume = ["--resume", "{value}"]
 model = ["--model", "{value}"]
 
-[client.run.permissions]
+[harness.run.permissions]
 default = ["--permission-mode", "dontAsk", "--allow", "MCPTool"]
 auto = ["--permission-mode", "auto"]
 acceptEdits = ["--permission-mode", "acceptEdits"]
 plan = ["--permission-mode", "plan"]
 
-[client.instructions]
+[harness.instructions]
 via = "flag"
 args = ["--rules", "{value}"]
 
-[client.mcp]
+[harness.mcp]
 via = "config-file"
 file = ".grok/config.toml"
 key = "mcp_servers"
@@ -49,13 +49,13 @@ drop = ["type"]
 # Parent merges these settings into the config alongside mcp_servers.
 settings = { compat = { claude = { mcps = false, hooks = false, skills = false, rules = false, agents = false }, cursor = { mcps = false, hooks = false, skills = false, rules = false, agents = false } }, cli = { auto_update = false } }
 
-[client.limits]
+[harness.limits]
 # Native output has no typed account-limit event. Error text is the only signal available.
 words = ["rate limit", "rate_limit", "too many requests", "quota exceeded", "usage limit"]
 
 
 # Added once in the apps; the node opens a fresh machine seal for every agent run.
-[client.key]
+[harness.key]
 secret = "grok.key"
 env = "XAI_API_KEY"
 
@@ -65,7 +65,7 @@ secrets = ["grok.key"]
 [[credentials]]
 id = "key"
 title = "xAI API key"
-help = "Create an API key in your xAI account. Pointman seals it in the vault and gives it only to this client's runs."
+help = "Create an API key in your xAI account. Pointman seals it in the vault and gives it only to this harness's runs."
 item = "grok.key"
 value = '\S{8,512}'
 placeholder = "xai-…"
