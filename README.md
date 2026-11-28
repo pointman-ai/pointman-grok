@@ -1,7 +1,7 @@
-# Pointman Grok client
+# Pointman Grok harness
 
-A client extension for xAI Grok Build. Repository: `pointman-ai/pointman-grok`.
-Requires Pointman node 0.4.2 or newer with the `grok-stream` decoder, `client.run.env`
+A harness extension for xAI Grok Build. Repository: `pointman-ai/pointman-grok`.
+Requires Pointman node 0.6.0 or newer with the `grok-stream` decoder, `harness.run.env`
 expansion, hidden relative config paths and MCP `settings` merging.
 
 ## Connect once
@@ -29,7 +29,7 @@ GROK_HOME=/absolute/node-state/homes/grok/my-agent/.grok \
 /absolute/path/to/grok login --device-auth
 ```
 
-Do not run these during automated checks. No existing login or another client's
+Do not run these during automated checks. No existing login or another harness's
 credentials are copied. Ordinary `grok login` with your usual HOME does not sign
 this isolated agent in. The node strips an inherited `XAI_API_KEY`, then injects the current vault key only for the run.
 There is no documented offline sign-in status check, so the manifest supplies none.
@@ -66,7 +66,7 @@ are failures. Native `error.message` becomes a failed result. Limit detection is
 an error-text heuristic, without invented quota windows. Unknown/malformed lines
 remain in the raw log; a missing terminal result fails the run.
 
-The decoder lives in the Pointman node at `node/src/clientstream/grok.rs`.
+The decoder lives in the Pointman node as its `grok-stream` decoder.
 Its tests cover native chunks, tools, session metadata, errors, partial cost,
 unknown shapes, cancellation and structured output failure. CI here checks only
 the manifest contract and fixture consistency:

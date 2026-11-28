@@ -11,17 +11,17 @@ class ManifestContract(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.manifest = tomllib.loads((ROOT / "extension.toml").read_text())
-        cls.client = cls.manifest["client"]
+        cls.harness = cls.manifest["harness"]
 
     def test_install_and_protocol(self):
         self.assertEqual(self.manifest["extension"]["id"], "grok")
-        self.assertEqual(self.manifest["extension"]["node"], ">=0.4.2")
-        self.assertEqual(self.client["protocol"], "grok-stream")
-        self.assertEqual(self.client["install"], {"from": "npm", "package": "@xai-official/grok"})
-        self.assertEqual(self.client["binaries"], ["grok"])
+        self.assertEqual(self.manifest["extension"]["node"], ">=0.6,<1")
+        self.assertEqual(self.harness["protocol"], "grok-stream")
+        self.assertEqual(self.harness["install"], {"from": "npm", "package": "@xai-official/grok"})
+        self.assertEqual(self.harness["binaries"], ["grok"])
 
     def test_new_and_resume_are_explicit_and_distinct(self):
-        run = self.client["run"]
+        run = self.harness["run"]
         self.assertEqual(run["new_session"], ["--session-id", "{value}"])
         self.assertEqual(run["resume"], ["--resume", "{value}"])
         self.assertIn("{session}", run["args"])
@@ -30,10 +30,10 @@ class ManifestContract(unittest.TestCase):
         self.assertEqual(run["args"][:5], ["--no-auto-update", "-p", "{prompt}", "--output-format", "streaming-json"])
 
     def test_home_and_compatibility_isolation(self):
-        self.assertEqual(self.client["home_env"], "HOME")
-        self.assertEqual(self.client["run"]["env"], {"GROK_HOME": "{home}/.grok"})
-        self.assertEqual(self.client["api_keys"], ["XAI_API_KEY"])
-        mcp = self.client["mcp"]
+        self.assertEqual(self.harness["home_env"], "HOME")
+        self.assertEqual(self.harness["run"]["env"], {"GROK_HOME": "{home}/.grok"})
+        self.assertEqual(self.harness["api_keys"], ["XAI_API_KEY"])
+        mcp = self.harness["mcp"]
         self.assertEqual((mcp["via"], mcp["file"], mcp["key"]), ("config-file", ".grok/config.toml", "mcp_servers"))
         for vendor in ("claude", "cursor"):
             self.assertEqual(mcp["settings"]["compat"][vendor], dict.fromkeys(("mcps", "hooks", "skills", "rules", "agents"), False))
@@ -41,13 +41,13 @@ class ManifestContract(unittest.TestCase):
         self.assertFalse(mcp["settings"]["cli"]["auto_update"])
 
     def test_behaviours_and_permissions(self):
-        self.assertEqual(self.client["instructions"], {"via": "flag", "args": ["--rules", "{value}"]})
-        self.assertEqual(set(self.client["run"]["permissions"]), {"default", "auto", "acceptEdits", "plan"})
-        self.assertEqual(self.client["run"]["permissions"]["default"], ["--permission-mode", "dontAsk", "--allow", "MCPTool"])
-        self.assertNotIn("check", self.client["sign_in"])
+        self.assertEqual(self.harness["instructions"], {"via": "flag", "args": ["--rules", "{value}"]})
+        self.assertEqual(set(self.harness["run"]["permissions"]), {"default", "auto", "acceptEdits", "plan"})
+        self.assertEqual(self.harness["run"]["permissions"]["default"], ["--permission-mode", "dontAsk", "--allow", "MCPTool"])
+        self.assertNotIn("check", self.harness["sign_in"])
 
     def test_one_vault_form_supplies_every_agents_run(self):
-        self.assertEqual(self.manifest["client"]["key"], {"secret": "grok.key", "env": "XAI_API_KEY"})
+        self.assertEqual(self.manifest["harness"]["key"], {"secret": "grok.key", "env": "XAI_API_KEY"})
         self.assertEqual(self.manifest["permissions"]["secrets"], ["grok.key"])
         self.assertEqual(self.manifest["credentials"][0]["item"], "grok.key")
         self.assertEqual((self.manifest["commands"][0]["slash"], self.manifest["commands"][0]["form"]), ("add", "key"))
